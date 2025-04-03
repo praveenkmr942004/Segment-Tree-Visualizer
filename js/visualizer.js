@@ -1,47 +1,3 @@
-function createSegmentTree() {
-    const input = document.getElementById("arrayInput").value;
-    if (!input.trim()) {
-        alert("Please enter an array!");
-        return;
-    }
-
-    const inputArray = input.split(",").map(num => parseInt(num.trim())).filter(num => !isNaN(num));
-
-    if (inputArray.length === 0 || inputArray.length > 8) {
-        alert("Invalid input. Please enter up to 8 numbers separated by commas.");
-        return;
-    }
-
-    window.segmentTree = new SegmentTree(inputArray);
-    visualizeTree(window.segmentTree);
-}
-
-function querySegmentTree() {
-    const left = parseInt(prompt("Enter left index:"));
-    const right = parseInt(prompt("Enter right index:"));
-
-    if (isNaN(left) || isNaN(right) || left < 0 || right >= window.segmentTree.n || left > right) {
-        alert("Invalid query range!");
-        return;
-    }
-
-    const result = window.segmentTree.query(0, 0, window.segmentTree.n - 1, left, right);
-    alert(`Sum in range [${left}, ${right}] = ${result}`);
-}
-
-function updateSegmentTree() {
-    const index = parseInt(prompt("Enter index to update:"));
-    const value = parseInt(prompt("Enter new value:"));
-
-    if (isNaN(index) || isNaN(value) || index < 0 || index >= window.segmentTree.n) {
-        alert("Invalid update operation!");
-        return;
-    }
-
-    window.segmentTree.update(0, 0, window.segmentTree.n - 1, index, value);
-    visualizeTree(window.segmentTree);  // Re-render the tree after update
-}
-
 function visualizeTree(segmentTree) {
     const svg = d3.select("#treeContainer");
     svg.selectAll("*").remove();
@@ -53,12 +9,14 @@ function visualizeTree(segmentTree) {
     const baseOffset = 50;
 
     function addNode(index, depth, xPos) {
-        if (index >= segmentTree.tree.length || segmentTree.tree[index] === null) return;
+        // Only add those nodes that are marked as visited, as explained in segmentTree.js line 11.
+        if (index >= segmentTree.tree.length || !segmentTree.tree[index] || !segmentTree.tree[index].mark)
+            return;
 
         const yPos = depth * 100 + 150;
         nodes.push({
             id: index,
-            value: segmentTree.tree[index].sum,
+            value: segmentTree.tree[index].value,
             left: segmentTree.tree[index].left,
             right: segmentTree.tree[index].right,
             x: xPos,
@@ -69,11 +27,12 @@ function visualizeTree(segmentTree) {
         const rightChild = 2 * index + 2;
         const offset = baseOffset * (1.5 ** (maxDepth - 1.9 * depth));
 
-        if (leftChild < segmentTree.tree.length && segmentTree.tree[leftChild] !== null) {
+        if (leftChild < segmentTree.tree.length && segmentTree.tree[leftChild] && segmentTree.tree[leftChild].mark) {
             links.push({ source: index, target: leftChild });
             addNode(leftChild, depth + 1, xPos - offset);
         }
-        if (rightChild < segmentTree.tree.length && segmentTree.tree[rightChild] !== null) {
+
+        if (rightChild < segmentTree.tree.length && segmentTree.tree[rightChild] && segmentTree.tree[rightChild].mark) {
             links.push({ source: index, target: rightChild });
             addNode(rightChild, depth + 1, xPos + offset);
         }
@@ -81,7 +40,6 @@ function visualizeTree(segmentTree) {
 
     addNode(0, 0, window.innerWidth / 2 - 230);
 
-    // Draw edges
     links.forEach(link => {
         const sourceNode = nodes.find(n => n.id === link.source);
         const targetNode = nodes.find(n => n.id === link.target);
@@ -90,10 +48,10 @@ function visualizeTree(segmentTree) {
             .attr("y1", sourceNode.y)
             .attr("x2", targetNode.x)
             .attr("y2", targetNode.y)
-            .attr("stroke", "white");
+            .attr("stroke", "white")
+            .attr("stroke-width", 2);
     });
 
-    // Draw nodes (Rectangles)
     nodes.forEach(node => {
         svg.append("rect")
             .attr("x", node.x - 35)

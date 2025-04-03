@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segment Tree Visualizer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <h1>Segment Tree Visualizer</h1>
+    
+    <label for="arrayInput">Enter Array (comma-separated):</label>
+    <input type="text" id="arrayInput" placeholder="Example: 1,3,5,7,9,11">
+    <button onclick="createSegmentTree()">Build Tree</button>
+    
+    <div class="controls">
+        <button onclick="querySegmentTree()">Query Range</button>
+        <button onclick="updateSegmentTree()">Update Value</button>
+    </div>
+
+    <svg id="treeContainer"></svg>
+
+    <script src="js/segmentTree.js"></script>
+    <script src="js/visualizer.js"></script>
+</body>
+</html>

@@ -7,13 +7,39 @@ function createSegmentTree() {
 
     const inputArray = input.split(",").map(num => parseInt(num.trim())).filter(num => !isNaN(num));
 
-    if (inputArray.length === 0 || inputArray.length > 8) {  // Now allows up to 8 elements
+    if (inputArray.length === 0 || inputArray.length > 8) {
         alert("Invalid input. Please enter up to 8 numbers separated by commas.");
         return;
     }
 
     window.segmentTree = new SegmentTree(inputArray);
     visualizeTree(window.segmentTree);
+}
+
+function querySegmentTree() {
+    const left = parseInt(prompt("Enter left index:"));
+    const right = parseInt(prompt("Enter right index:"));
+
+    if (isNaN(left) || isNaN(right) || left < 0 || right >= window.segmentTree.n || left > right) {
+        alert("Invalid query range!");
+        return;
+    }
+
+    const result = window.segmentTree.query(0, 0, window.segmentTree.n - 1, left, right);
+    alert(`Sum in range [${left}, ${right}] = ${result}`);
+}
+
+function updateSegmentTree() {
+    const index = parseInt(prompt("Enter index to update:"));
+    const value = parseInt(prompt("Enter new value:"));
+
+    if (isNaN(index) || isNaN(value) || index < 0 || index >= window.segmentTree.n) {
+        alert("Invalid update operation!");
+        return;
+    }
+
+    window.segmentTree.update(0, 0, window.segmentTree.n - 1, index, value);
+    visualizeTree(window.segmentTree);  // Re-render the tree after update
 }
 
 function visualizeTree(segmentTree) {
@@ -24,12 +50,12 @@ function visualizeTree(segmentTree) {
     const links = [];
 
     const maxDepth = Math.ceil(Math.log2(segmentTree.n)) + 1;
-    const baseOffset = 60;  // Adjusted spacing for better visualization
+    const baseOffset = 60;
 
     function addNode(index, depth, xPos) {
         if (index >= segmentTree.tree.length || segmentTree.tree[index] === null) return;
 
-        const yPos = depth * 100 + 50;  // Adjusted vertical spacing
+        const yPos = depth * 100 + 50;
         nodes.push({
             id: index,
             value: segmentTree.tree[index].sum,
@@ -41,7 +67,7 @@ function visualizeTree(segmentTree) {
 
         const leftChild = 2 * index + 1;
         const rightChild = 2 * index + 2;
-        const offset = baseOffset * (1.5 ** (maxDepth - 1.9 * depth));  // Adjusted horizontal spacing
+        const offset = baseOffset * (1.5 ** (maxDepth - 1.9 * depth));
 
         if (leftChild < segmentTree.tree.length && segmentTree.tree[leftChild] !== null) {
             links.push({ source: index, target: leftChild });
@@ -53,7 +79,7 @@ function visualizeTree(segmentTree) {
         }
     }
 
-    addNode(0, 0, window.innerWidth / 2 - 90);  // Ensure the tree is always centered
+    addNode(0, 0, window.innerWidth / 2 - 90);
 
     // Draw edges
     links.forEach(link => {

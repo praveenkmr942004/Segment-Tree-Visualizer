@@ -50,12 +50,12 @@ function visualizeTree(segmentTree) {
     const links = [];
 
     const maxDepth = Math.ceil(Math.log2(segmentTree.n)) + 1;
-    const baseOffset = 60;
+    const baseOffset = 50;
 
     function addNode(index, depth, xPos) {
         if (index >= segmentTree.tree.length || segmentTree.tree[index] === null) return;
 
-        const yPos = depth * 100 + 50;
+        const yPos = depth * 100 + 150;
         nodes.push({
             id: index,
             value: segmentTree.tree[index].sum,
@@ -79,7 +79,7 @@ function visualizeTree(segmentTree) {
         }
     }
 
-    addNode(0, 0, window.innerWidth / 2 - 90);
+    addNode(0, 0, window.innerWidth / 2 - 230);
 
     // Draw edges
     links.forEach(link => {

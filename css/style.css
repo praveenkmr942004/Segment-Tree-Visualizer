@@ -29,7 +29,7 @@ body {
 }
 
 .controls {
-    width: 25%;
+    width: 27%;
     background-color: #1a1a1a;
     border-right: 2px solid #444;
     display: flex;
@@ -137,7 +137,7 @@ button:focus {
 }
 
 .visualization {
-    width: 75%;
+    width: 73%;
     height: 100%;
     background-color: #222;
     display: flex;

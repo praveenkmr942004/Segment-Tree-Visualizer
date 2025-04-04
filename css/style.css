@@ -5,55 +5,76 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
     height: 100vh;
 }
 
-.container {
-    display: flex;
-    width: 100%;
-    height: 100%;
+.heading-box {
+    text-align: center;
+    background: linear-gradient(135deg, #e3dfdc, #cab561);
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 15px;
+    border-radius: 10px;
+    z-index: 1000;
 }
 
-.heading-box {
-    position: fixed;
-    top: 80px;
-    left: 100px;
-    background: linear-gradient(135deg, #ff7b00, #ffcc00);
-    color: black;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(255, 140, 0, 0.4);
-    z-index: 1000;
-    font-family: 'Arial', sans-serif;
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100% - 70px);
 }
 
 .controls {
     width: 25%;
-    padding: 20px;
+    background-color: #1a1a1a;
+    border-right: 2px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.controls-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background-color: #1a1a1a;
+    width: 90%;
 }
 
-.controls input,
+.controls label {
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.controls textarea,
 .controls button,
 .controls select {
-    width: 85%;
+    width: 100%;
     margin: 10px 0;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
-    border-radius: 5px;
+    border-radius: 6px;
     border: none;
+    box-sizing: border-box;
 }
 
-input {
+textarea#arrayInput {
     background-color: #333;
     color: white;
-    text-align: center;
+    text-align: left;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 40px;
+    max-height: 200px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 button {
@@ -61,10 +82,15 @@ button {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 button:hover {
     background-color: #218838;
+}
+
+button:focus {
+    outline: 2px solid #ffcc00;
 }
 
 .controls select {
@@ -73,36 +99,11 @@ button:hover {
     text-align: center;
     border: none;
     appearance: none;
-    cursor: pointer;
     padding-right: 30px;
-    
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 16px;
-}
-
-.controls select:hover {
-    background-color: #444;
-}
-
-.controls select:focus {
-    outline: none;
-    border: 2px solid #28a745;
-}
-
-.visualization {
-    width: 75%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #222;
-}
-
-svg {
-    width: 95%;
-    height: 90%;
-    border: 1px solid #444;
 }
 
 .github-container {
@@ -133,4 +134,41 @@ svg {
     content: " (Enjoyed it? Drop a star ⭐)";
     font-size: 12px;
     color: #ffcc00;
+}
+
+.visualization {
+    width: 75%;
+    height: 100%;
+    background-color: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+svg {
+    width: 98%;
+    height: 90%;
+    border: 1px solid #444;
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .controls,
+    .visualization {
+        width: 100%;
+        height: auto;
+    }
+
+    .controls {
+        border-right: none;
+        border-bottom: 2px solid #444;
+        padding: 20px 0;
+    }
+
+    svg {
+        height: 60vh;
+    }
 }

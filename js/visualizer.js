@@ -1,78 +1,90 @@
-function visualizeTree(segmentTree) {
-    const svg = d3.select("#treeContainer");
+function visualizeTree(segmentTree, containerId) {
+    const svg = d3.select(`#${containerId}`);
     svg.selectAll("*").remove();
 
-    const nodes = [];
-    const links = [];
+    const width = svg.node().getBoundingClientRect().width;
+    const height = svg.node().getBoundingClientRect().height;
 
-    const maxDepth = Math.ceil(Math.log2(segmentTree.n)) + 1;
-    const baseOffset = 50;
+    const horizontalPadding = 100;
+    const treeLayout = d3.tree()
+        .size([width - 2 * horizontalPadding, height - 100])
+        .separation((a, b) => 1.5);
 
-    function addNode(index, depth, xPos) {
-        // Only add those nodes that are marked as visited, as explained in segmentTree.js line 11.
-        if (index >= segmentTree.tree.length || !segmentTree.tree[index] || !segmentTree.tree[index].mark)
-            return;
+    const data = buildTreeStructure(0, 0, segmentTree.n - 1);
+    const root = d3.hierarchy(data);
+    treeLayout(root);
 
-        const yPos = depth * 100 + 150;
-        nodes.push({
-            id: index,
-            value: segmentTree.tree[index].value,
-            left: segmentTree.tree[index].left,
-            right: segmentTree.tree[index].right,
-            x: xPos,
-            y: yPos
-        });
+    const g = svg.append("g").attr("transform", `translate(${horizontalPadding}, 40)`);
 
-        const leftChild = 2 * index + 1;
-        const rightChild = 2 * index + 2;
-        const offset = baseOffset * (1.5 ** (maxDepth - 1.9 * depth));
+    const linkGenerator = d3.linkHorizontal()
+        .x(d => d.x)
+        .y(d => d.y);
 
-        if (leftChild < segmentTree.tree.length && segmentTree.tree[leftChild] && segmentTree.tree[leftChild].mark) {
-            links.push({ source: index, target: leftChild });
-            addNode(leftChild, depth + 1, xPos - offset);
-        }
+    g.selectAll("path")
+        .data(root.links())
+        .enter()
+        .append("path")
+        .attr("d", linkGenerator)
+        .attr("stroke", "white")
+        .attr("fill", "none");
 
-        if (rightChild < segmentTree.tree.length && segmentTree.tree[rightChild] && segmentTree.tree[rightChild].mark) {
-            links.push({ source: index, target: rightChild });
-            addNode(rightChild, depth + 1, xPos + offset);
-        }
+    const nodeSize = 50;
+    g.selectAll("rect")
+        .data(root.descendants())
+        .enter()
+        .append("rect")
+        .attr("x", d => d.x - nodeSize / 2)
+        .attr("y", d => d.y - nodeSize / 2)
+        .attr("width", nodeSize)
+        .attr("height", nodeSize)
+        .attr("fill", "#28a745")
+        .attr("rx", 6)
+        .attr("ry", 6);
+
+    g.selectAll(".node-value")
+        .data(root.descendants())
+        .enter()
+        .append("text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y - 4)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", "14px")
+        .text(d => d.data.value);
+
+    g.selectAll(".node-range")
+        .data(root.descendants())
+        .enter()
+        .append("text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y + 14)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", "12px")
+        .text(d => `(${d.data.start}, ${d.data.end})`);
+}
+
+function buildTreeStructure(node, start, end) {
+    if (start === end) {
+        return {
+            value: segmentTree.tree[node].toString(),
+            start,
+            end
+        };
     }
 
-    addNode(0, 0, window.innerWidth / 2 - 230);
-
-    links.forEach(link => {
-        const sourceNode = nodes.find(n => n.id === link.source);
-        const targetNode = nodes.find(n => n.id === link.target);
-        svg.append("line")
-            .attr("x1", sourceNode.x)
-            .attr("y1", sourceNode.y)
-            .attr("x2", targetNode.x)
-            .attr("y2", targetNode.y)
-            .attr("stroke", "white")
-            .attr("stroke-width", 2);
-    });
-
-    nodes.forEach(node => {
-        svg.append("rect")
-            .attr("x", node.x - 35)
-            .attr("y", node.y - 25)
-            .attr("width", 70)
-            .attr("height", 50)
-            .attr("rx", 5)
-            .attr("ry", 5)
-            .attr("fill", "#1e90ff")
-            .attr("stroke", "white");
-
-        svg.append("text")
-            .attr("x", node.x)
-            .attr("y", node.y - 5)
-            .attr("text-anchor", "middle")
-            .text(`${node.value}`);
-
-        svg.append("text")
-            .attr("x", node.x)
-            .attr("y", node.y + 15)
-            .attr("text-anchor", "middle")
-            .text(`[${node.left}, ${node.right}]`);
-    });
+    const mid = Math.floor((start + end) / 2);
+    return {
+        value: segmentTree.tree[node].toString(),
+        start,
+        end,
+        children: [
+            buildTreeStructure(2 * node + 1, start, mid),
+            buildTreeStructure(2 * node + 2, mid + 1, end)
+        ]
+    };
 }
+
+window.onload = function () {
+    createSegmentTree();
+};

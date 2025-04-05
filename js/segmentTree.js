@@ -4,6 +4,7 @@ class SegmentTree {
         this.n = arr.length;
         this.operation = operation;
         this.tree = new Array(4 * this.n).fill(null);
+        this.visited = new Array(4 * this.n).fill(false); 
         this.buildTree(0, 0, this.n - 1);
     }
 
@@ -33,10 +34,13 @@ class SegmentTree {
     }
 
     update(index, value) {
+        this.visited.fill(false); 
         this._updateTree(0, 0, this.n - 1, index, value);
     }
 
     _updateTree(node, start, end, index, value) {
+        this.visited[node] = true;
+
         if (start === end) {
             this.arr[index] = value;
             this.tree[node] = value;
@@ -53,12 +57,15 @@ class SegmentTree {
     }
 
     query(left, right) {
+        this.visited.fill(false);
         return this._queryTree(0, 0, this.n - 1, left, right);
     }
 
     _queryTree(node, start, end, left, right) {
         if (right < start || left > end)
             return this._getNeutralValue();
+
+        this.visited[node] = true;
 
         if (left <= start && end <= right)
             return this.tree[node];
@@ -115,6 +122,7 @@ function querySegmentTree() {
 
     const result = segmentTree.query(left, right);
     alert(`Query Result: ${result}`);
+    visualizeTree(segmentTree, "treeContainer");
 }
 
 function updateSegmentTree() {

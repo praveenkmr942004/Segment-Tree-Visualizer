@@ -37,7 +37,14 @@ function visualizeTree(segmentTree, containerId) {
         .attr("y", d => d.y - nodeSize / 2)
         .attr("width", nodeSize)
         .attr("height", nodeSize)
-        .attr("fill", "#28a745")
+        .attr("fill", d => {
+            const nodeIndex = d.data.nodeIndex;
+            if (segmentTree.visited[nodeIndex]) {
+                segmentTree.visited[nodeIndex] = false;
+                return "blue";
+            }
+            return "#28a745";
+        })
         .attr("rx", 6)
         .attr("ry", 6);
 
@@ -69,7 +76,8 @@ function buildTreeStructure(node, start, end) {
         return {
             value: segmentTree.tree[node].toString(),
             start,
-            end
+            end,
+            nodeIndex: node
         };
     }
 
@@ -78,6 +86,7 @@ function buildTreeStructure(node, start, end) {
         value: segmentTree.tree[node].toString(),
         start,
         end,
+        nodeIndex: node,
         children: [
             buildTreeStructure(2 * node + 1, start, mid),
             buildTreeStructure(2 * node + 2, mid + 1, end)
